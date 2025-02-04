@@ -32,10 +32,10 @@ mer=80
 lm_resume=        # specify a snapshot file to resume LM training
 lmtag=            # tag for managing LMs
 
-nj=200
+nj=20
 process_xml="python"
 
-datadir=DB
+datadir="/export/fs05/mkhelfi1/MGB-2/MGB-2/"
 
 # model average realted (only for transformer)
 n_average=5                  # the number of ASR models to be averaged
@@ -85,7 +85,7 @@ train=train
 
 
 if [ $stage -le -1 ]; then
-  local/mgb_extract_data.sh $datadir
+  local/mgb_extract_data.sh ${datadir}
 fi
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
@@ -103,11 +103,13 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "stage 1: Feature Generation"
     fbankdir=fbank
     # Generate the fbank features; by default 80-dimensional fbanks with pitch on each frame
+    
     for x in test dev ${train}; do
         steps/make_fbank_pitch.sh --cmd "$train_cmd" --nj $nj --write_utt2num_frames true \
             data/${x} exp/make_fbank/${x} ${fbankdir}
         utils/fix_data_dir.sh data/${x}
     done
+
     # remove_longshortdata.sh --maxframes x --maxchars y data/train data/${train_trim}
     # remove utt having more than 3000 frames
     # remove utt having more than 400 characters

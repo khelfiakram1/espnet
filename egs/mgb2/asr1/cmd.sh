@@ -28,7 +28,7 @@
 
 
 # Select the backend used by run.sh from "local", "sge", "slurm", or "ssh"
-cmd_backend='local'
+cmd_backend='slurm'
 
 # Local machine, without any Job scheduling system
 if [ "${cmd_backend}" = local ]; then
@@ -47,7 +47,7 @@ elif [ "${cmd_backend}" = sge ]; then
     # To know the "queue" names, type "qhost -q"
     # Note that to use "--gpu *", you have to setup "complex_value" for the system scheduler.
 
-    export train_cmd="queue.pl"
+    export train_cmd="queue.pl --mem 4G -l hostname=c10" 
     export cuda_cmd="queue.pl"
     export decode_cmd="queue.pl"
 
@@ -58,10 +58,10 @@ elif [ "${cmd_backend}" = slurm ]; then
     # To know the "partion" names, type "sinfo".
     # You can use "--gpu * " by default for slurm and it is interpreted as "--gres gpu:*"
     # The devices are allocated exclusively using "${CUDA_VISIBLE_DEVICES}".
-
-    export train_cmd="slurm.pl"
-    export cuda_cmd="slurm.pl"
-    export decode_cmd="slurm.pl"
+    #export kaldi_cmd="slurm.pl --config conf/slurm_kaldi.conf --mem 4G --time 512:00:0"
+    export train_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 4G --time 512:00:0 --nodelist c13"
+    export cuda_cmd="slurm.pl  --config conf/slurm_clsp_a100.conf --mem 20G --time 512:00:00"
+    export decode_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 4G --time 512:00:0"
 
 elif [ "${cmd_backend}" = ssh ]; then
     # You have to create ".queue/machines" to specify the host to execute jobs.

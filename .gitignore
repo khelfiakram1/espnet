@@ -110,3 +110,4 @@ tools/Miniconda3-latest-*.sh
 tools/Miniforge3-*.sh
 tools/condarc
 tools/lightning_constraints.txt
+*.log
