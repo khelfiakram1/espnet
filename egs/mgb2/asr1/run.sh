@@ -15,12 +15,12 @@
 backend=pytorch
 stage=1   # start from -1 if you need to start from data download
 stop_stage=100
-ngpu=1         # number of gpus ("0" uses cpu, otherwise use gpu)
+ngpu=4   # number of gpus ("0" uses cpu, otherwise use gpu)
 debugmode=1
 dumpdir=dump   # directory to dump full features
 N=0            # number of minibatches to be used (mainly for debugging). "0" uses all minibatches.
 verbose=0      # verbose option
-resume=      # Resume the training from snapshot
+resume=     # Resume the training from snapshot
 subset=1100  # in case we want to use subset of training data
 # feature configuration
 do_delta=false
@@ -30,9 +30,9 @@ mer=80
 
 # rnnlm related
 lm_resume=        # specify a snapshot file to resume LM training
-lmtag=            # tag for managing LMs
+lmtag="4gpu"         # tag for managing LMs
 
-nj=20
+nj=26
 process_xml="python"
 
 datadir="/export/fs05/mkhelfi1/MGB-2/MGB-2/"
@@ -47,7 +47,7 @@ use_lm_valbest_average=false # if true, the validation `lm_n_average`-best langu
 
 
 
-# rnnlm related
+# # rnnlm related
 lm_resume= # specify a snapshot file to resume LM training
 lmtag=     # tag for managing LMs
 
@@ -60,7 +60,7 @@ nbpe=5000
 bpemode=unigram
 
 # exp tag
-tag="" # tag for managing experiments.
+tag="2gpu_2grad" # tag for managing experiments.
 
 # configuration files during training
 preprocess_config=conf/specaug.yaml
@@ -80,7 +80,7 @@ set -o pipefail
 
 train_set=train_trim_sp
 train_dev=dev_trim
-recog_set="dev test"
+recog_set="test"
 train=train
 
 
@@ -110,12 +110,14 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
         utils/fix_data_dir.sh data/${x}
     done
 
-    # remove_longshortdata.sh --maxframes x --maxchars y data/train data/${train_trim}
-    # remove utt having more than 3000 frames
-    # remove utt having more than 400 characters
+     # remove_longshortdata.sh --maxframes x --maxchars y data/train data/${train_trim}
+    # # remove utt having more than 3000 frames
+    # # remove utt having more than 400 characters
     remove_longshortdata.sh --maxframes 3000 --maxchars 400 data/${train} data/train_trim
     remove_longshortdata.sh --maxframes 3000 --maxchars 400 data/dev data/${train_dev}
 
+    utils/data/get_reco2dur.sh data/train_trim
+    utils/data/get_reco2dur.sh data/dev_trim
     # speed perturbation
     utils/perturb_data_dir_speed.sh 0.9 data/train_trim data/temp1
     utils/perturb_data_dir_speed.sh 1.0 data/train_trim data/temp2
@@ -201,7 +203,8 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
         cut -f 2- -d" " data/${train_dev}/text | spm_encode --model=${bpemodel}.model --output_format=piece > ${lmdatadir}/valid.txt
 
     fi
-    ${cuda_cmd} --gpu ${ngpu} ${lmexpdir}/train.log \
+    echo "LM Training Starting now"
+    ${train_cmd} --gpu ${ngpu} ${lmexpdir}/train.log \
         lm_train.py \
         --config ${lm_config} \
         --ngpu ${ngpu} \
@@ -290,6 +293,7 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
                 --num ${lm_n_average}
         fi
     fi
+    
 
     pids=() # initialize pids
     for rtask in ${recog_set}; do
@@ -313,8 +317,9 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
             --recog-json ${feat_recog_dir}/split${nj}utt/data_${bpemode}${nbpe}.JOB.json \
             --result-label ${expdir}/${decode_dir}/data.JOB.json \
             --model ${expdir}/results/${recog_model}  \
-            --rnnlm ${lmexpdir}/${lang_model} \
-            --api v2
+            #--api v2
+            # --rnnlm ${lmexpdir}/${lang_model} \
+            #--api v2
 
         score_sclite.sh --bpe ${nbpe} --bpemodel ${bpemodel}.model --wer true ${expdir}/${decode_dir} ${dict}
 

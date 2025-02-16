@@ -5,7 +5,7 @@ set -e
 set -u
 set -o pipefail
 
-fs=22050
+fs=16000
 n_fft=1024
 n_shift=256
 opts=
@@ -27,6 +27,7 @@ g2p=none # Include no word separator
 
 bash ./tts.sh \
     --stage 1 \
+    --stop_stage 1 \
     --lang ar \
     --feats_type raw \
     --fs "${fs}" \

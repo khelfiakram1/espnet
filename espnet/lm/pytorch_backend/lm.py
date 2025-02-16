@@ -211,6 +211,7 @@ def train(args):
     :param Namespace args: The program arguments
     :param type model_class: LMInterface class for training
     """
+    logging.info("access LM file")
     model_class = dynamic_import_lm(args.model_module, args.backend)
     assert issubclass(model_class, LMInterface), "model should implement LMInterface"
     # display torch version

@@ -6,6 +6,7 @@ import logging
 from collections import OrderedDict
 from collections.abc import Sequence
 from inspect import signature
+import time
 
 import yaml
 
@@ -116,7 +117,7 @@ class Transformation(object):
 
         if isinstance(uttid_list, str):
             uttid_list = [uttid_list for _ in range(len(xs))]
-
+        logging.info("start transformation")
         if self.conf.get("mode", "sequential") == "sequential":
             for idx in range(len(self.conf["process"])):
                 func = self.functions[idx]
@@ -138,6 +139,8 @@ class Transformation(object):
                         "Catch a exception from {}th func: {}".format(idx, func)
                     )
                     raise
+                logging.info("Transformation %s took %.3f sec", func.__class__.__name__, time.time() )
+
         else:
             raise NotImplementedError(
                 "Not supporting mode={}".format(self.conf["mode"])

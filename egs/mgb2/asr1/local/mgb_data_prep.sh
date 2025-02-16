@@ -13,7 +13,6 @@ process_xml=$2
 subset=$3  # subset of training data
 mer=$4
 test_dir=data/test
-
 train_dir=data/train
 dev_dir=data/dev
 
@@ -40,6 +39,7 @@ head -n $subset $train_dir/wav_list > $train_dir/wav_list.short
 set -e -o pipefail
 
 xmldir=$db_dir/train/xml/bw
+
 if [ $process_xml == "python" ]; then
   echo "using python to process xml file"
   # check if bs4 and lxml are installin in python
@@ -91,7 +91,7 @@ if [ ! -f $dev_dir/utt2spk ]; then
 fi
 if [ ! -f $dev_dir/spk2utt ]; then
   utils/utt2spk_to_spk2utt.pl $dev_dir/utt2spk > $dev_dir/spk2utt
-fi
+fit
 
 # separate the overlapped dev files from non overlapped
 for list in overlap non_overlap; do

@@ -111,3 +111,6 @@ tools/Miniforge3-*.sh
 tools/condarc
 tools/lightning_constraints.txt
 *.log
+tools/installers/chainer_ctc
+tools/installers/chainer_ctc
+egs/mgb3/asr1/ipynb/download_data.ipynb

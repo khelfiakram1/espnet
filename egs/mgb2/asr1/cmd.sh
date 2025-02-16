@@ -59,9 +59,9 @@ elif [ "${cmd_backend}" = slurm ]; then
     # You can use "--gpu * " by default for slurm and it is interpreted as "--gres gpu:*"
     # The devices are allocated exclusively using "${CUDA_VISIBLE_DEVICES}".
     #export kaldi_cmd="slurm.pl --config conf/slurm_kaldi.conf --mem 4G --time 512:00:0"
-    export train_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 4G --time 512:00:0 --nodelist c13"
+    export train_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 20G --time 512:00:0 --nodelist c13"
     export cuda_cmd="slurm.pl  --config conf/slurm_clsp_a100.conf --mem 20G --time 512:00:00"
-    export decode_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 4G --time 512:00:0"
+    export decode_cmd="slurm.pl --config conf/slurm_clsp.conf --mem 20G --time 512:00:0"
 
 elif [ "${cmd_backend}" = ssh ]; then
     # You have to create ".queue/machines" to specify the host to execute jobs.

@@ -271,13 +271,15 @@ def main(cmd_args):
     args.n_vocab = len(char_list)
 
     # train
-    logging.info("backend = " + args.backend)
+    logging.info("backend is = " + args.backend)
     if args.backend == "chainer":
         from espnet.lm.chainer_backend.lm import train
 
         train(args)
     elif args.backend == "pytorch":
+        logging.info("import train for pythorch")
         from espnet.lm.pytorch_backend.lm import train
+        logging.info("import train successful")
 
         train(args)
     else:
